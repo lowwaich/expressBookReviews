@@ -25,7 +25,7 @@ public_users.get('/isbn/:isbn',function (req, res) {
 public_users.get('/author/:author',function (req, res) {
   // Extract the author parameter from the request URL
   const author = req.params.author;
-  
+
   // Convert object values into an array, then filter by author
   const all_books = Object.values(books);
   let filtered_books = all_books.filter((book) => book.author === author);
@@ -36,8 +36,15 @@ public_users.get('/author/:author',function (req, res) {
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  // Extract the title parameter from the request URL
+  const title = req.params.title;
+  
+  // Convert object values into an array, then filter by title
+  const all_books = Object.values(books);
+  let filtered_books = all_books.filter((book) => book.title === title);
+  
+  // Send the filtered results neatly formatted
+  return res.send(JSON.stringify(filtered_books, null, 4));
 });
 
 //  Get book review
