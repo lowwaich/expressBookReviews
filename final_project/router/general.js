@@ -139,17 +139,40 @@ public_users.get('/author/:author', async function (req, res) {
     }
 });
 
+const getBooksByTitle = (books, title) => {
+    return new Promise((resolve, reject) => {
+        // Convert object values into an array, then filter by title
+        const all_books = Object.values(books);
+        let filtered_books = all_books.filter((book) => book.title === title);
+
+        if (filtered_books) {
+            console.log(`Books for title fetched`);
+            resolve(filtered_books);
+        } else {
+            reject(new Error(`There is no book for title`));
+        }
+    });
+}
+
 // Get all books based on title
-public_users.get('/title/:title', function (req, res) {
+public_users.get('/title/:title', async function (req, res) {
     // Extract the title parameter from the request URL
     const title = req.params.title;
+    const booksdb = books;
 
-    // Convert object values into an array, then filter by title
-    const all_books = Object.values(books);
-    let filtered_books = all_books.filter((book) => book.title === title);
+    try {
+        const fetchedBooks = await getBooksByTitle(booksdb, title);
 
-    // Send the filtered results neatly formatted
-    return res.send(JSON.stringify(filtered_books, null, 4));
+        if (fetchedBooks) {
+            res.send(JSON.stringify(fetchedBooks, null, 4));
+        } else {
+            res.status(404).json({ message: `Could not find book for title.` });
+        }
+
+    } catch (err) {
+        console.error(`Error fetching data: ${err.message}.`);
+        res.status(500).json({ message: `Internal Server Error while fetching books. Please try again` });
+    }
 });
 
 //  Get book review
