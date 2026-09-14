@@ -51,8 +51,32 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  // 1. Get the username directly from the session
+  const username = req.session.authorization?.username;
+
+  if (!username) {
+      return res.status(403).json({ message: "User not logged in" });
+  }
+
+  const isbn = req.params.isbn;
+  const review = req.body.review; // or req.body.review depending on project specs
+
+  // 2. Logic to add/update the review using the username
+  if (books[isbn]) {
+      // Initialize reviews object if it doesn't exist
+      if (!books[isbn].reviews) {
+          books[isbn].reviews = {};
+      }
+      
+      // Save or update the review under this specific username
+      books[isbn].reviews[username] = review;
+      
+      return res.status(200).json({ 
+          message: `Review successfully added/updated by ${username}` 
+      });
+  } else {
+      return res.status(404).json({ message: "Book not found" });
+  }
 });
 
 module.exports.authenticated = regd_users;
