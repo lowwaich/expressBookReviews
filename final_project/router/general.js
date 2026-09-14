@@ -103,17 +103,40 @@ public_users.get('/isbn/:isbn', async function (req, res) {
     }
 });
 
+const getBooksByAuthor = (books, author) => {
+    return new Promise((resolve, reject) => {
+        // Convert object values into an array, then filter by author
+        const all_books = Object.values(books);
+        let filtered_books = all_books.filter((book) => book.author === author);
+
+        if (filtered_books) {
+            console.log(`Books for author fetched`);
+            resolve(filtered_books);
+        } else {
+            reject(new Error(`There is no book for author`));
+        }
+    });
+}
+
 // Get book details based on author
-public_users.get('/author/:author', function (req, res) {
+public_users.get('/author/:author', async function (req, res) {
     // Extract the author parameter from the request URL
     const author = req.params.author;
+    const booksdb = books;
 
-    // Convert object values into an array, then filter by author
-    const all_books = Object.values(books);
-    let filtered_books = all_books.filter((book) => book.author === author);
+    try {
+        const fetchedBooks = await getBooksByAuthor(booksdb, author);
 
-    // Send the filtered results neatly formatted
-    return res.send(JSON.stringify(filtered_books, null, 4));
+        if (fetchedBooks) {
+            res.send(JSON.stringify(fetchedBooks, null, 4));
+        } else {
+            res.status(404).json({ message: `Could not find book for author.` });
+        }
+
+    } catch (err) {
+        console.error(`Error fetching data: ${err.message}.`);
+        res.status(500).json({ message: `Internal Server Error while fetching books. Please try again` });
+    }
 });
 
 // Get all books based on title
