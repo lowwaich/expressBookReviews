@@ -17,15 +17,21 @@ public_users.get('/',function (req, res) {
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
   const isbn = req.params.isbn;
   return res.send(books[isbn]);
  });
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  // Extract the author parameter from the request URL
+  const author = req.params.author;
+  
+  // Convert object values into an array, then filter by author
+  const all_books = Object.values(books);
+  let filtered_books = all_books.filter((book) => book.author === author);
+  
+  // Send the filtered results neatly formatted
+  return res.send(JSON.stringify(filtered_books, null, 4));
 });
 
 // Get all books based on title
